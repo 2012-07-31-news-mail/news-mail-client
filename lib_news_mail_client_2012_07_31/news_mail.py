@@ -20,7 +20,7 @@ from __future__ import absolute_import
 assert unicode is not str
 assert str is bytes
 
-import base64, json, datetime
+import itertools, base64, json, datetime
 from tornado import ioloop, stack_context, gen
 from . import get_items, async_http_request_helper
 
@@ -155,7 +155,14 @@ def bulk_news_mail(url, key, to_iter, subject_iter, msg_iter,
 def news_mail(cfg, on_finish=None):
     on_finish = stack_context.wrap(on_finish)
     
-    to_iter = get_items.get_random_finite_items(cfg.to_items)
+    if cfg.count is not None and cfg.count == 'infinite':
+        to_iter = get_items.get_random_infinite_items(cfg.to_items)
+    elif cfg.count is not None:
+        count = int(cfg.count)
+        to_iter = itertools.islice(get_items.get_random_infinite_items(cfg.to_items), count)
+    else:
+        to_iter = get_items.get_random_finite_items(cfg.to_items)
+    
     subject_iter = get_items.get_random_infinite_items(cfg.subject_items)
     msg_iter = get_items.get_random_infinite_items(cfg.msg_items)
     
