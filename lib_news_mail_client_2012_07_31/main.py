@@ -61,6 +61,8 @@ def main():
             if config.has_option(cfg_section, 'msg-items') else None
     cfg.format = config.get(cfg_section, 'format') \
             if config.has_option(cfg_section, 'format') else None
+    cfg.count = config.get(cfg_section, 'count') \
+            if config.has_option(cfg_section, 'count') else None
     cfg.conc = int(config.get(cfg_section, 'conc')) \
             if config.has_option(cfg_section, 'conc') else None
     cfg.delay = float(config.get(cfg_section, 'delay')) \
