@@ -108,3 +108,19 @@ def get_random_infinite_items(path):
         
         for item in items:
             yield item
+
+def get_subject_and_body(items_iter):
+    for item in items_iter:
+        spl_item = item.lstrip().split('\n', 1)
+        
+        if len(spl_item) != 2:
+            continue
+        
+        subject, body = spl_item
+        
+        body = body.lstrip()
+        
+        if not subject or not body:
+            continue
+        
+        yield subject, body

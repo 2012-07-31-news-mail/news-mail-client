@@ -68,19 +68,29 @@ def apply_format(format, msg):
         raise NotImplementedError
 
 @gen.engine
-def news_mail_thread(url, key, to_iter, subject_iter, msg_iter,
-            format=None, conc=None, delay=None, on_finish=None):
+def news_mail_thread(url, key, to_iter, msg_iter,
+            subject_iter=None, format=None, conc=None, delay=None, on_finish=None):
     to_iter = iter(to_iter)
-    subject_iter = iter(subject_iter)
     msg_iter = iter(msg_iter)
     on_finish = stack_context.wrap(on_finish)
     
+    if subject_iter is not None:
+        subject_iter = iter(subject_iter)
     if delay is None:
         delay = DEFAULT_DELAY
     
+    if subject_iter is not None:
+        def get_subject_and_body():
+            return next(subject_iter), next(msg_iter)
+    else:
+        subject_and_body_iter = get_items.get_subject_and_body(msg_iter)
+        
+        def get_subject_and_body():
+            return next(subject_and_body_iter)
+    
     for to in to_iter:
-        subject = next(subject_iter)
-        msg = next(msg_iter)
+        subject, msg = get_subject_and_body()
+        
         content_type, msg_data = apply_format(format, msg)
         headers = [
             'Content-Type: %s' % content_type,
@@ -129,21 +139,22 @@ def news_mail_thread(url, key, to_iter, subject_iter, msg_iter,
         on_finish()
 
 @gen.engine
-def bulk_news_mail(url, key, to_iter, subject_iter, msg_iter,
-            format=None, conc=None, delay=None, on_finish=None):
+def bulk_news_mail(url, key, to_iter, msg_iter,
+            subject_iter=None, format=None, conc=None, delay=None, on_finish=None):
     to_iter = iter(to_iter)
-    subject_iter = iter(subject_iter)
     msg_iter = iter(msg_iter)
     on_finish = stack_context.wrap(on_finish)
     
+    if subject_iter is not None:
+        subject_iter = iter(subject_iter)
     if conc is None:
         conc = DEFAULT_CONC
     
     wait_key_list = tuple(object() for x in xrange(conc))
     
     for wait_key in wait_key_list:
-        news_mail_thread(url, key, to_iter, subject_iter, msg_iter,
-                format=format, conc=conc, delay=delay,
+        news_mail_thread(url, key, to_iter, msg_iter,
+                subject_iter=subject_iter, format=format, conc=conc, delay=delay,
                 on_finish=(yield gen.Callback(wait_key)))
     
     for wait_key in wait_key_list:
@@ -163,9 +174,13 @@ def news_mail(cfg, on_finish=None):
     else:
         to_iter = get_items.get_random_finite_items(cfg.to_items)
     
-    subject_iter = get_items.get_random_infinite_items(cfg.subject_items)
     msg_iter = get_items.get_random_infinite_items(cfg.msg_items)
     
-    bulk_news_mail(cfg.url, cfg.key, to_iter, subject_iter, msg_iter,
-            format=cfg.format, conc=cfg.conc, delay=cfg.delay,
+    if cfg.subject_items is not None:
+        subject_iter = get_items.get_random_infinite_items(cfg.subject_items)
+    else:
+        subject_iter = None
+    
+    bulk_news_mail(cfg.url, cfg.key, to_iter, msg_iter,
+            subject_iter=subject_iter, format=cfg.format, conc=cfg.conc, delay=cfg.delay,
             on_finish=on_finish)
