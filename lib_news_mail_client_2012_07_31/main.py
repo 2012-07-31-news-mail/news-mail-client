@@ -55,10 +55,10 @@ def main():
             if config.has_option(cfg_section, 'key') else None
     cfg.to_items = os.path.join(cfg_dir, config.get(cfg_section, 'to-items')) \
             if config.has_option(cfg_section, 'to-items') else None
-    cfg.subject_items = os.path.join(cfg_dir, config.get(cfg_section, 'subject-items')) \
-            if config.has_option(cfg_section, 'subject-items') else None
     cfg.msg_items = os.path.join(cfg_dir, config.get(cfg_section, 'msg-items')) \
             if config.has_option(cfg_section, 'msg-items') else None
+    cfg.subject_items = os.path.join(cfg_dir, config.get(cfg_section, 'subject-items')) \
+            if config.has_option(cfg_section, 'subject-items') else None
     cfg.format = config.get(cfg_section, 'format') \
             if config.has_option(cfg_section, 'format') else None
     cfg.count = config.get(cfg_section, 'count') \
