@@ -104,12 +104,10 @@ def news_mail_thread(url, key, to_iter, msg_iter,
         print '%s: opening...' % to
         
         if delay:
-            delay_wait_key = object()
-            ioloop.IOLoop.instance().add_timeout(
+            yield gen.Task(
+                    ioloop.IOLoop.instance().add_timeout,
                     datetime.timedelta(seconds=delay),
-                    (yield gen.Callback(delay_wait_key)),
                     )
-            yield gen.Wait(delay_wait_key)
         
         response, exc = (yield gen.Task(
                 async_http_request_helper.async_fetch,
