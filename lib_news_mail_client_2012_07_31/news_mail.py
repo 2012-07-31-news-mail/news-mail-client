@@ -69,7 +69,7 @@ def apply_format(format, msg):
 
 @gen.engine
 def news_mail_thread(url, key, to_iter, msg_iter,
-            subject_iter=None, format=None, conc=None, delay=None, on_finish=None):
+            subject_iter=None, format=None, delay=None, on_finish=None):
     to_iter = iter(to_iter)
     msg_iter = iter(msg_iter)
     on_finish = stack_context.wrap(on_finish)
@@ -111,19 +111,23 @@ def news_mail_thread(url, key, to_iter, msg_iter,
                     )
             yield gen.Wait(delay_wait_key)
         
-        req_wait_key = object()
-        async_http_request_helper.async_fetch(url, data={
-            'key': key,
-            'data': json.dumps({
-                'mail': {
-                    'to': to,
-                    'subject': i_string_encode(subject),
-                    'message': base64_data(msg_data),
-                    'headers': headers_data,
+        response, exc = (yield gen.Task(
+                async_http_request_helper.async_fetch,
+                url,
+                data={
+                    'key': key,
+                    'data': json.dumps({
+                        'mail': {
+                            'to': to,
+                            'subject': i_string_encode(subject),
+                            'message': base64_data(msg_data),
+                            'headers': headers_data,
+                        },
+                    }),
                 },
-            }),
-        }, callback=(yield gen.Callback(req_wait_key)), use_json=True, use_raise=False)
-        response, exc = (yield gen.Wait(req_wait_key))[0]
+                use_json=True,
+                use_raise=False,
+                ))[0]
         
         if exc is None and not response.get('error'):
             print '%s: PASS' % to
@@ -154,7 +158,7 @@ def bulk_news_mail(url, key, to_iter, msg_iter,
     
     for wait_key in wait_key_list:
         news_mail_thread(url, key, to_iter, msg_iter,
-                subject_iter=subject_iter, format=format, conc=conc, delay=delay,
+                subject_iter=subject_iter, format=format, delay=delay,
                 on_finish=(yield gen.Callback(wait_key)))
     
     for wait_key in wait_key_list:
