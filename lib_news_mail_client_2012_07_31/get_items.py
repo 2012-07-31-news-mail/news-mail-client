@@ -20,7 +20,7 @@ from __future__ import absolute_import
 assert unicode is not str
 assert str is bytes
 
-import os, os.path, itertools, random
+import os, os.path, itertools, random, re
 
 class NotFoundError(IOError):
     pass
@@ -109,6 +109,20 @@ def get_random_infinite_items(path):
         for item in items:
             yield item
 
+def clean_subject(subject):
+    m = re.match(
+            r'^\<h1\>(?P<h1>[^<>]*)\<\/h1\>$',
+            subject,
+            re.S | re.U,
+            )
+    
+    h1 = m.group('h1')
+    
+    if h1:
+        return h1
+    
+    return m.group()
+
 def get_subject_and_body(items_iter):
     for item in items_iter:
         spl_item = item.lstrip().split('\n', 1)
@@ -118,6 +132,7 @@ def get_subject_and_body(items_iter):
         
         subject, body = spl_item
         
+        subject = clean_subject(subject.rstrip())
         body = body.lstrip()
         
         if not subject or not body:
