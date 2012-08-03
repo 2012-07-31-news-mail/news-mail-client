@@ -116,12 +116,15 @@ def clean_subject(subject):
             re.S | re.U,
             )
     
+    if m is None:
+        return subject
+    
     h1 = m.group('h1')
     
     if h1:
         return h1
     
-    return m.group()
+    return subject
 
 def get_subject_and_body(items_iter):
     for item in items_iter:
