@@ -47,23 +47,29 @@ def main():
     
     cfg_section = 'news-mail-client'
     cfg_dir = os.path.dirname(args.cfg)
-    cfg.url = config.get(cfg_section, 'url') \
+    cfg.url = config.get(cfg_section, 'url').decode('utf-8', 'replace') \
             if config.has_option(cfg_section, 'url') else None
-    cfg.key = config.get(cfg_section, 'key') \
+    cfg.key = config.get(cfg_section, 'key').decode('utf-8', 'replace') \
             if config.has_option(cfg_section, 'key') else None
-    cfg.to_items = os.path.join(cfg_dir, config.get(cfg_section, 'to-items')) \
-            if config.has_option(cfg_section, 'to-items') else None
-    cfg.msg_items = os.path.join(cfg_dir, config.get(cfg_section, 'msg-items')) \
-            if config.has_option(cfg_section, 'msg-items') else None
-    cfg.subject_items = os.path.join(cfg_dir, config.get(cfg_section, 'subject-items')) \
-            if config.has_option(cfg_section, 'subject-items') else None
-    cfg.format = config.get(cfg_section, 'format') \
+    cfg.to_items = os.path.join(
+                cfg_dir,
+                config.get(cfg_section, 'to-items').decode('utf-8', 'replace')
+            ) if config.has_option(cfg_section, 'to-items') else None
+    cfg.msg_items = os.path.join(
+                cfg_dir,
+                config.get(cfg_section, 'msg-items').decode('utf-8', 'replace')
+            ) if config.has_option(cfg_section, 'msg-items') else None
+    cfg.subject_items = os.path.join(
+                cfg_dir,
+                config.get(cfg_section, 'subject-items').decode('utf-8', 'replace')
+            ) if config.has_option(cfg_section, 'subject-items') else None
+    cfg.format = config.get(cfg_section, 'format').decode('utf-8', 'replace') \
             if config.has_option(cfg_section, 'format') else None
-    cfg.count = config.get(cfg_section, 'count') \
+    cfg.count = config.get(cfg_section, 'count').decode('utf-8', 'replace') \
             if config.has_option(cfg_section, 'count') else None
-    cfg.conc = int(config.get(cfg_section, 'conc')) \
+    cfg.conc = int(config.get(cfg_section, 'conc').decode('utf-8', 'replace')) \
             if config.has_option(cfg_section, 'conc') else None
-    cfg.delay = float(config.get(cfg_section, 'delay')) \
+    cfg.delay = float(config.get(cfg_section, 'delay').decode('utf-8', 'replace')) \
             if config.has_option(cfg_section, 'delay') else None
     
     news_mail(cfg, on_finish=final)
