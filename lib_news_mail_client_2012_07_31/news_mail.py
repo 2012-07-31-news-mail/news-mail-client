@@ -168,7 +168,7 @@ def bulk_news_mail(url, key, to_iter, msg_iter,
 def news_mail(cfg, on_finish=None):
     on_finish = stack_context.wrap(on_finish)
     
-    if cfg.count is not None and cfg.count == 'infinite':
+    if cfg.count == 'infinite':
         to_iter = get_items.get_random_infinite_items(cfg.to_items)
     elif cfg.count is not None:
         count = int(cfg.count)
