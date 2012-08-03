@@ -24,6 +24,9 @@ import argparse, ConfigParser, os.path
 from tornado import ioloop
 from .news_mail import news_mail
 
+class UserError(Exception):
+    pass
+
 class Config(object):
     pass
 
@@ -71,6 +74,11 @@ def main():
             if config.has_option(cfg_section, 'conc') else None
     cfg.delay = float(config.get(cfg_section, 'delay').decode('utf-8', 'replace')) \
             if config.has_option(cfg_section, 'delay') else None
+    
+    if cfg.to_items is None:
+        raise UserError('cfg.to_items is None')
+    if cfg.msg_items is None:
+        raise UserError('cfg.msg_items is None')
     
     news_mail(cfg, on_finish=final)
     
