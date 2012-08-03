@@ -31,8 +31,6 @@ def final():
     print(u'done!')
     ioloop.IOLoop.instance().stop()
 
-
-
 def main():
     parser = argparse.ArgumentParser(
             description=
