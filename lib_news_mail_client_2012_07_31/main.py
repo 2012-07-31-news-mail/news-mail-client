@@ -20,7 +20,7 @@ from __future__ import absolute_import
 assert unicode is not str
 assert str is bytes
 
-import argparse, ConfigParser, os.path
+import argparse, ConfigParser, sys, os.path
 from tornado import ioloop
 from .news_mail import news_mail
 
@@ -49,7 +49,8 @@ def main():
     cfg = Config()
     
     cfg_section = 'news-mail-client'
-    cfg_dir = os.path.dirname(args.cfg)
+    cfg_dir = os.path.dirname(args.cfg).decode(sys.getfilesystemencoding())
+    
     cfg.url = config.get(cfg_section, 'url').decode('utf-8', 'replace') \
             if config.has_option(cfg_section, 'url') else None
     cfg.key = config.get(cfg_section, 'key').decode('utf-8', 'replace') \
